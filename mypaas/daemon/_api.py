@@ -165,7 +165,7 @@ async def push(request):
         return 403, {}, "Access denied"
 
     # Get given file
-    payload = await request.get_body(100 * 2**20)  # 100 MiB limit
+    payload = await request.get_body(1000 * 2**20)  # 1000 MiB limit
 
     # Also validate it
     if not validate_payload(request, payload):
