@@ -39,7 +39,7 @@ def push(domain, dockerfile):
     # The verify=True checks the cert (default True, but let's be explicit).
     r = requests.get(base_url + "/time", verify=True)
     if r.status_code != 200:
-        raise RuntimeError("Could not get server time: " + r.text)
+        raise RuntimeError(f"Could not get server time: {r.text}. Is the server daemon running?")
     server_time = int(r.text)
 
     # Zip it up
