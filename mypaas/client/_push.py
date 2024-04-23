@@ -57,7 +57,8 @@ def push(domain, dockerfile):
                     zf.write(filename, fname_in_zip)
         zf.write(dockerfile, "Dockerfile")  # the deploy will simply use "Dockerfile"
     payload = f.getvalue()
-
+    fileSize = f.getbuffer().nbytes
+    print(f":heavy_check_mark: Deploy file size is {fileSize / 2**20} MiB.")
     # Compose a nice little token, and a signature for it that can only be
     # produced with the private key. The public key can verify this signature
     # to confirm that we have the private key.
