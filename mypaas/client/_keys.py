@@ -151,6 +151,7 @@ def key_gen():
 
     # Copy public key
     _show_public_key(public_key)
+    _show_private_key(private_key)
 
 
 def key_get():
@@ -186,12 +187,19 @@ def get_private_key():
     try:
         return PrivateKey.from_str(text, pp)
     except Exception as err:
-        raise RuntimeError(f":x: Could not load key from {filename}: {str(err)}")
+        raise RuntimeError(f"[x] Could not load key from {filename}: {str(err)}")
 
 
 def _show_public_key(public_key):
     pyperclip.copy(public_key.to_str())
-    print()
+    print("RSA public key:")
     print(public_key.to_str())
     print(public_text)
     print("\n[i] Keypair fingerprint: " + public_key.get_id())
+
+
+def _show_private_key(private_key):
+    pyperclip.copy(private_key.to_str())
+    print("RSA private key:")
+    print(private_key.to_str())
+    print(private_text)
