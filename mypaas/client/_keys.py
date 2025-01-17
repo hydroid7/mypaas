@@ -201,5 +201,5 @@ def _show_public_key(public_key):
 def _show_private_key(private_key):
     pyperclip.copy(private_key.to_str())
     print("RSA private key:")
-    print(private_key.to_str())
+    print(private_key.to_str(None))
     print(private_text)
