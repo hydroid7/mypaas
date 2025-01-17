@@ -2,7 +2,6 @@ import os
 import io
 import zipfile
 from urllib.parse import quote
-from rich import print
 import requests
 
 from ._keys import get_private_key
@@ -15,22 +14,12 @@ def push(domain, dockerfile):
     to your PaaS, where it will be deployed as an app/service.
     """
     config = deploy_config(dockerfile)
-
     if domain.lower().startswith(("https://", "http://")):
         domain = domain.split("//", 1)[-1]
     base_url = "https://" + domain.rstrip("/") + "/daemon"
 
-    # Check dockerfile and get directory
-    dockerfile = os.path.abspath(dockerfile)
-    if os.path.isfile(dockerfile):
-        directory = os.path.dirname(dockerfile)
-    elif os.path.isdir(dockerfile):
-        directory = dockerfile
-        dockerfile = os.path.join(directory, "Dockerfile")
-        if not os.path.isfile(dockerfile):
-            raise RuntimeError(f"No Dockerfile found in {directory!r}")
-    else:
-        raise RuntimeError(f"Given dockerfile not a file nor directory: {dockerfile!r}")
+    dockerfile = config["dockerfile"]
+    directory = config["directory"]
 
     # Get the client's private key, used to sign the payload
     private_key = get_private_key()
@@ -43,7 +32,7 @@ def push(domain, dockerfile):
     server_time = int(r.text)
 
     # Zip it up
-    print(":heavy_check_mark: Zipping up ...")
+    print("✔ Zipping up ...")
     f = io.BytesIO()
     with zipfile.ZipFile(f, "w") as zf:
         for root, dirs, files in os.walk(directory):
@@ -58,7 +47,7 @@ def push(domain, dockerfile):
         zf.write(dockerfile, "Dockerfile")  # the deploy will simply use "Dockerfile"
     payload = f.getvalue()
     fileSize = f.getbuffer().nbytes
-    print(f":heavy_check_mark: Deploy file size is {fileSize / 2**20} MiB.")
+    print(f"✔ Deploy file size is {fileSize / 2**20:.2f} MiB.")
     # Compose a nice little token, and a signature for it that can only be
     # produced with the private key. The public key can verify this signature
     # to confirm that we have the private key.
@@ -70,10 +59,10 @@ def push(domain, dockerfile):
     # POST to the deploy server
     url = base_url + f"/push?id={fingerprint}&token={token}"
     url += f"&sig1={quote(sig1)}&sig2={quote(sig2)}"
-    print(f":heavy_check_mark: Pushing ...")
+    print(f"✔ Pushing ...")
     r = requests.post(url, data=payload, stream=True, verify=True)
     if r.status_code != 200:
-        raise RuntimeError(":x: Push failed: " + r.text)
+        raise RuntimeError("Push failed: " + r.text)
     else:
         for line in r.iter_lines():
             if isinstance(line, bytes):
