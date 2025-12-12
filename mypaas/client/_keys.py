@@ -24,7 +24,6 @@ private key. You can safely share the public key; it is not a secret.
 The public key is now on the clipboard. SSH into your paas server
 and add it to ~/_mypaas/authorized_keys
 """.rstrip()
-
 OPTIONS = [
     f"0. Keep as it is",
     f"1. Generate a new RSA keypair (and store it in '{default_key_filename}')",
@@ -151,7 +150,6 @@ def key_gen():
 
     # Copy public key
     _show_public_key(public_key)
-    _show_private_key(private_key)
 
 
 def key_get():
@@ -196,10 +194,3 @@ def _show_public_key(public_key):
     print(public_key.to_str())
     print(public_text)
     print("\n[i] Keypair fingerprint: " + public_key.get_id())
-
-
-def _show_private_key(private_key):
-    pyperclip.copy(private_key.to_str())
-    print("RSA private key:")
-    print(private_key.to_str(None))
-    print(private_text)
